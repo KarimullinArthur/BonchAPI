@@ -1,0 +1,62 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "bonchapi"
+dynamic = ["version"]
+description = 'API for lk.sut.ru'
+readme = "README.md"
+requires-python = ">=3.8"
+license = "MIT"
+keywords = ["API", "Bonch", "SPbSUT", "lk.sut.ru"]
+authors = [
+  { name = "Karimullin Arthur", email = "KarimullinArthur@disroot.org" },
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
+]
+dependencies = [
+  "aiohttp",
+  "beautifulsoup4",
+  "lxml",
+]
+
+[project.urls]
+Documentation = "https://github.com/KarimullinArthur/BonchAPI#readme"
+Issues = "https://github.com/KarimullinArthur/BonchAPI/issues"
+Source = "https://github.com/KarimullinArthur/BonchAPI"
+
+[tool.hatch.version]
+path = "bonchapi/__meta__.py"
+
+[tool.hatch.envs.types]
+extra-dependencies = [
+  "mypy>=1.0.0",
+]
+[tool.hatch.envs.types.scripts]
+check = "mypy --install-types --non-interactive {args:src/bonchapi tests}"
+
+[tool.coverage.run]
+source_pkgs = ["bonchapi", "tests"]
+branch = true
+parallel = true
+
+[tool.coverage.paths]
+bonchapi = ["bonchapi"]
+tests = ["tests"]
+
+[tool.coverage.report]
+exclude_lines = [
+  "no cov",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+]
