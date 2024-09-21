@@ -5,11 +5,11 @@ build-backend = "hatchling.build"
 [project]
 name = "bonchapi"
 dynamic = ["version"]
-description = 'API for lk.sut.ru'
+description = 'API client for lk.sut.ru'
 readme = "README.md"
 requires-python = ">=3.8"
-license = "MIT"
-keywords = ["API", "Bonch", "SPbSUT", "lk.sut.ru"]
+license = {file = "LICENSE"}
+keywords = ["API", "API-client", "Bonch", "SPbSUT", "lk.sut.ru"]
 authors = [
   { name = "Karimullin Arthur", email = "KarimullinArthur@disroot.org" },
 ]
