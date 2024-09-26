@@ -50,6 +50,9 @@ class BonchAPI:
                     await self.get_raw_timetable()
                 return await resp.text()
 
+    async def get_timetable(self):
+        return await parser.get_my_lessons(await self.get_raw_timetable())
+
     async def click_start_lesson(self):
         URL = "https://lk.sut.ru/cabinet/project/cabinet/forms/raspisanie.php"
 
