@@ -43,12 +43,18 @@ async def get_my_lessons(html_inp) -> list[dict]:
                 lesson_type = " ".join(
                     lesson_type.split()[: lesson_type.split().index("началось") - 1]
                 )
-
+            
+            # Понедельник28.10.2024 -> Понедельник 28.10.2024
             for char in current_day:
                 if char in ("1", "2", "3", "4", "5", "6", "7", "8", "9", "0"):
-                    date = current_day[current_day.index(char) :]
-                    current_day = current_day[: current_day.index(char)]
+                    date = current_day[current_day.index(char):]
+                    current_day = current_day[:current_day.index(char)]
                     break
+
+            
+            # date to ISO 8601
+            date = date.split('.')
+            date = '-'.join(date[::-1])
 
             schedule_data.append(
                 {
