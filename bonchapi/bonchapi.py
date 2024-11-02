@@ -1,6 +1,9 @@
 import aiohttp
+from typing import List
 
 from . import parser
+from . import schemas
+from bonchapi import schemas
 
 
 class AuthError(ValueError):
@@ -49,8 +52,8 @@ class BonchAPI:
                     await self.login(self.mail, self.password)
                     await self.get_raw_timetable()
                 return await resp.text()
-
-    async def get_timetable(self):
+    
+    async def get_timetable(self) -> List[schemas.Lesson]:
         return await parser.get_my_lessons(await self.get_raw_timetable())
 
     async def click_start_lesson(self):

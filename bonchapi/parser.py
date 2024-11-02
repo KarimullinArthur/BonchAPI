@@ -2,6 +2,8 @@ import re
 
 from bs4 import BeautifulSoup
 
+from bonchapi.schemas import Lesson
+
 
 async def get_week(html_inp):
     soup = BeautifulSoup(html_inp, features="lxml")
@@ -15,10 +17,11 @@ async def get_lesson_id(html_inp):
     return ids
 
 
-async def get_my_lessons(html_inp) -> list[dict]:
+async def get_my_lessons(html_inp) -> list[Lesson]:
     soup = BeautifulSoup(html_inp, "html.parser")
     table = soup.find("table", class_="simple-little-table")
 
+    result = []
     schedule_data = []
     rows = table.find_all("tr")
 
@@ -37,13 +40,16 @@ async def get_my_lessons(html_inp) -> list[dict]:
             # Динамит вне времени...
             if time[0] == "(":
                 time = cols[0].text.strip().split()[-1][1:-1]
-            
+
+            if number == "13.30-15.00":
+                number = 3
+
             # Нажал кнопку начать занятие..
             if "началось" in lesson_type.split():
                 lesson_type = " ".join(
                     lesson_type.split()[: lesson_type.split().index("началось") - 1]
                 )
-            
+
             # Понедельник28.10.2024 -> Понедельник 28.10.2024
             for char in current_day:
                 if char in ("1", "2", "3", "4", "5", "6", "7", "8", "9", "0"):
@@ -51,13 +57,11 @@ async def get_my_lessons(html_inp) -> list[dict]:
                     current_day = current_day[:current_day.index(char)]
                     break
 
-            
             # date to ISO 8601
             date = date.split('.')
             date = '-'.join(date[::-1])
 
-            schedule_data.append(
-                {
+            schedule_data = {
                     "date": date,
                     "day": current_day,
                     "time": time,
@@ -66,7 +70,7 @@ async def get_my_lessons(html_inp) -> list[dict]:
                     "lesson_type": lesson_type,
                     "location": location,
                     "teacher": teacher,
-                }
-            )
+            }
+            result.append(Lesson(**schedule_data))
 
-    return schedule_data
+    return result
