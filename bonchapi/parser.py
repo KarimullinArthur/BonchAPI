@@ -8,7 +8,7 @@ from bonchapi.schemas import Lesson
 async def get_week(html_inp):
     soup = BeautifulSoup(html_inp, features="lxml")
     week = soup.find("h3").text.split("№")[1].split()[0]
-    return week
+    return int(week)
 
 
 async def get_lesson_id(html_inp):
@@ -43,6 +43,9 @@ async def get_my_lessons(html_inp) -> list[Lesson]:
 
             if number == "13.30-15.00":
                 number = 3
+
+            if "-" in str(number):
+                number = None
 
             # Нажал кнопку начать занятие..
             if "началось" in lesson_type.split():

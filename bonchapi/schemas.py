@@ -8,8 +8,8 @@ from . import validator
 class Lesson(validator.Validations):
     date: str
     day: str
-    time: str
     number: int
+    time: str
     subject: str
     lesson_type: str
     location: str
@@ -22,3 +22,7 @@ class Lesson(validator.Validations):
         if isinstance(value, str):
             value = int(value)
         return value
+
+    def __iter__(self):
+#         return self
+         return iter([self.date, self.day, self.number, self.time, self.subject, self.lesson_type, self.location, self.teacher])
