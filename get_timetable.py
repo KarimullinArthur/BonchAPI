@@ -1,16 +1,13 @@
 import asyncio
 import argparse
+import os
 
 from bonchapi import BonchAPI
-
-from bonchapi.bonchapi import AuthError
-from bonchapi.schemas import Lesson
-from get_token_from_browser import Brow
 
 import dotenv
 
 
-dotenv.load_dotenv(dotenv_path="./examples/autoclick")
+dotenv.load_dotenv(dotenv_path="./examples/autoclick/.env")
 
 
 parser = argparse.ArgumentParser(
@@ -21,37 +18,17 @@ parser = argparse.ArgumentParser(
 parser.add_argument('week_offset', nargs="?", type=int, default=0)
 args = parser.parse_args()
 
+
 async def main():
     api = BonchAPI()
 
     api.cookies = {}
 
-    def write_brow_token():
-        browser = Brow()
-        token = browser.get_token()
-        setattr(api, "cookies", {}) 
-        with open("/tmp/bonch-token", "w") as file:
-            file.write(token)
-        api.cookies["miden"] = token
+    mail = str(os.environ.get("mail"))
+    password = str(os.environ.get("password"))
 
-    def read_token_from_cache():
-        with open("/tmp/bonch-token", "r") as file:
-            token = file.readline()
-            api.cookies["miden"] = token
+    await api.login(mail, password) 
 
-#     write_brow_token()
-
-    try:
-        read_token_from_cache()
-    except FileNotFoundError:
-        write_brow_token()
-
-    try:
-        rsp = await api.get_timetable(week_offset=args.week_offset)
-    except AuthError:
-        write_brow_token()
-
-    
     rsp = await api.get_timetable(week_offset=args.week_offset)
 
     week: list[str] = []
