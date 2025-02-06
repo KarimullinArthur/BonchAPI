@@ -16,8 +16,11 @@ class AuthError(ValueError):
 class BonchAPI:
     @staticmethod
     async def get_token() -> str:
+        URL = "https://lk.sut.ru/cabinet"
+
         async with aiohttp.ClientSession() as session:
-            async with session.get("https://lk.sut.ru/cabinet/?") as resp:
+            async with session.get(URL) as resp:
+                resp.raise_for_status()
                 token = (
                     str(resp.cookies.get("miden"))
                     .split(":")[1]
@@ -26,22 +29,28 @@ class BonchAPI:
                 )
                 return token
 
-    async def login(self, mail: str, password: str, from_browser=False) -> bool:
-        URL = "https://lk.sut.ru/cabinet/lib/autentificationok.php"
-
-        token = await self.get_token()
+    async def login(self, mail: str, password: str) -> bool:
+        AUTH = f"https://lk.sut.ru/cabinet/lib/autentificationok.php?users={mail}&parole={password}"
+        CABINET = "https://lk.sut.ru/cabinet/"
+        
+        self.token = await self.get_token()
         self.mail = mail
         self.password = password
-        self.cookies = {"miden": token}
-        payload = {"users": mail, "parole": password}
+        self.cookies = {"miden": self.token}
+        
+        async with aiohttp.ClientSession() as session:
+            async with session.get(CABINET) as resp:
+                resp.raise_for_status()
 
-        if from_browser:
-            pass
-        else:
-            async with aiohttp.ClientSession() as session:
-                async with session.post(URL, cookies=self.cookies, data=payload) as resp:
-                    if await resp.text() == "1":
-                        return True
+                self.cookies = resp.cookies
+                self.cookies["miden"] = self.token
+
+                async with session.post(AUTH) as resp:
+                    resp.raise_for_status()
+                    text = await resp.text()
+                    if text == '1':
+                        async with session.get(CABINET) as resp:
+                            return True
                     else:
                         raise AuthError
 
@@ -52,9 +61,6 @@ class BonchAPI:
 
         async with aiohttp.ClientSession() as session:
             async with session.post(URL, cookies=self.cookies) as resp:
-#                 print(week_number)
-#                 print(URL)
-#                 print(await resp.text())
                 bonch_acess_error_msg = "У Вас нет прав доступа. Или необходимо перезагрузить приложение.."
                 if await resp.text() == bonch_acess_error_msg:
                     await self.login(self.mail, self.password)
