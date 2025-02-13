@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "bonchapi"
-version = "0.0.5"
+version = "0.0.6"
 description = 'API client for lk.sut.ru'
 readme = "README.md"
 requires-python = ">=3.8"
