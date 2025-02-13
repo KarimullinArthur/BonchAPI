@@ -66,11 +66,28 @@ class BonchAPI:
                     await self.login(self.mail, self.password)
                     await self.get_raw_timetable(week_number)
                 return await resp.text()
+
+    async def find_first_week_id(self) -> int:
+        '''
+        Получение ID первой учебной недели в *семестре*
+        '''
+        MAX_WEEK = 50
+
+        for i in (0,-1,-2,1,2):
+            id = MAX_WEEK//2+i
+            guess = await parser.get_week(await self.get_raw_timetable(id))
+            if guess == 0:
+                return id
+        return 0
     
     async def get_timetable(self, week_number: int = False, *, week_offset: int = False) -> List[schemas.Lesson]:
         if week_offset:
+
+            if not hasattr(self, "_first_week"):
+                self._first_week = await self.find_first_week_id()
+                
             current_week = await parser.get_week(await self.get_raw_timetable(week_number))
-            desired_week = current_week + week_offset
+            desired_week = current_week + week_offset + self._first_week
             return await parser.get_my_lessons(await self.get_raw_timetable(desired_week))
 
         else:
