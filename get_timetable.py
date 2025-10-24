@@ -27,7 +27,7 @@ async def main():
     mail = str(os.environ.get("mail"))
     password = str(os.environ.get("password"))
 
-    await api.login(mail, password) 
+    await api.login(mail, password)
 
     rsp = await api.get_timetable(week_offset=args.week_offset)
 

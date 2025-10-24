@@ -18,7 +18,7 @@ class BonchAPI:
     async def get_token() -> str:
         URL = "https://lk.sut.ru/cabinet"
 
-        async with aiohttp.ClientSession() as session:
+        async with aiohttp.ClientSession(headers={"User-Agent": "firefox"}) as session:
             async with session.get(URL) as resp:
                 resp.raise_for_status()
                 token = (
@@ -43,12 +43,11 @@ class BonchAPI:
                 resp.raise_for_status()
 
                 self.cookies = resp.cookies
-                self.cookies["miden"] = self.token
 
                 async with session.post(AUTH) as resp:
                     resp.raise_for_status()
                     text = await resp.text()
-                    if text == '1':
+                    if text == '\n1':
                         async with session.get(CABINET) as resp:
                             return True
                     else:
@@ -85,7 +84,7 @@ class BonchAPI:
 
             if not hasattr(self, "_first_week"):
                 self._first_week = await self.find_first_week_id()
-                
+               
             current_week = await parser.get_week(await self.get_raw_timetable(week_number))
             desired_week = current_week + week_offset + self._first_week
             return await parser.get_my_lessons(await self.get_raw_timetable(desired_week))
